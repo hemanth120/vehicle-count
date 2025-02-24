@@ -14,11 +14,18 @@ with open("coco.txt", "r") as f:
 # Define tracking instance
 tracker = Tracker()
 
+def mousrePtr(event,x,y,flags,param):
+    if event == cv2.EVENT_MOUSEMOVE:
+        print([x,y])
+    
+
+cv2.namedWindow('Vehicle_count')
+cv2.setMouseCallback('Vehicle_count',mousrePtr)
 # Open video capture
 cap = cv2.VideoCapture('highway.mp4')
 
 # Line crossing detection setup
-line_y = 360  # Adjust based on your image
+line_y = 322  # Adjust based on your image
 tracked_ids = set()   # Keeps track of seen vehicles
 crossed_ids = set()   # Ensures each vehicle is counted only once
 incoming_vehicle_count = 0
@@ -61,7 +68,7 @@ while True:
                 incoming_vehicle_count += 1
                 crossed_ids.add(obj_id)
 
-            elif y3 > line_y and y4 <= line_y:  # Vehicle moved upward across the line
+            elif y3>  line_y and y4 <= line_y:  # Vehicle moved upward across the line
                 outgoing_vehicle_count += 1
                 crossed_ids.add(obj_id)
 
@@ -71,15 +78,16 @@ while True:
         cv2.putText(frame, f'ID: {obj_id}', (x3, y3 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
 
     # Draw the counting line
-    cv2.line(frame, (155, 337), (444, 388), (0, 0, 255), 2)
+    cv2.line(frame, (180, line_y), (469, line_y), (0, 0, 255), 2)
+    cv2.line(frame, (532, line_y), (795, line_y), (0, 0, 255), 2)
 
     # Display vehicle counts
     cv2.putText(frame, f'Incoming Vehicles: {incoming_vehicle_count}', (737, 432), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
     cv2.putText(frame, f'Outgoing Vehicles: {outgoing_vehicle_count}', (738, 479), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 0), 2)
 
-    cv2.imshow("CV", frame)
+    cv2.imshow("Vehicle_count", frame)
 
-    if cv2.waitKey(1) & 0xFF == 27:
+    if cv2.waitKey(0) & 0xFF == 27:
         break
 
 cap.release()
