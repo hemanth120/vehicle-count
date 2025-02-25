@@ -59,24 +59,23 @@ while True:
     tracked_objects = tracker.update(vehicle_boxes)
 
     for obj in tracked_objects:
-        x3, y3, x4, y4, obj_id = obj
-        cx, cy = (x3 + x4) // 2, (y3 + y4) // 2  # Compute centroid
+      x3, y3, x4, y4, obj_id = obj
+      cx, cy = (x3 + x4) // 2, (y3 + y4) // 2  # Compute centroid
+ 
+      if obj_id not in crossed_ids:
+            if cy < line_y and cy + 10 >= line_y:  # Moving downward
+                 incoming_vehicle_count += 1
+                 crossed_ids.add(obj_id)
 
-        # Check if the vehicle crossed the line from top to bottom
-        if obj_id not in crossed_ids:
-            if y3 < line_y and y4 >= line_y:  # Vehicle moved downward across the line
-                incoming_vehicle_count += 1
-                crossed_ids.add(obj_id)
+            elif cy > line_y and cy - 10 <= line_y:  # Moving upward
+               outgoing_vehicle_count += 1
+               crossed_ids.add(obj_id)
+            cv2.rectangle(frame, (x3, y3), (x4, y4), (0, 255, 0), 2)
+            cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
+            cv2.putText(frame, f'ID: {obj_id}', (x3, y3 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
 
-            elif y3>  line_y and y4 <= line_y:  # Vehicle moved upward across the line
-                outgoing_vehicle_count += 1
-                crossed_ids.add(obj_id)
-
-        # Draw bounding box and centroid
-        cv2.rectangle(frame, (x3, y3), (x4, y4), (0, 255, 0), 2)
-        cv2.circle(frame, (cx, cy), 5, (0, 0, 255), -1)
-        cv2.putText(frame, f'ID: {obj_id}', (x3, y3 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 1)
-
+    # Draw bounding box and centroid
+   
     # Draw the counting line
     cv2.line(frame, (180, line_y), (469, line_y), (0, 0, 255), 2)
     cv2.line(frame, (532, line_y), (795, line_y), (0, 0, 255), 2)
